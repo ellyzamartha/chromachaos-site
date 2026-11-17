@@ -50,6 +50,7 @@ def page(title, desc, canonical, body, image=None) -> str:
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
 <link rel="canonical" href="{e(canonical)}">
+<meta name="p:domain_verify" content="9238c19ef6ee2fa88fe342c61b3635e4"/>
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{e(canonical)}"><meta property="og:type" content="website">{og}
 <link rel="alternate" type="application/rss+xml" title="ChromaChaos new sets" href="/feed.xml">
