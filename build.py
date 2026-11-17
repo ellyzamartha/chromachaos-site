@@ -30,11 +30,13 @@ def today() -> dt.date:
 
 
 def path_of(p) -> str:
+    if p.get("path"):
+        return p["path"]
     return f"/{p['slug']}/{PATHS.get(p['variant'], p['variant'] + '/')}"
 
 
 def etsy(p) -> str:
-    return f"https://www.etsy.com/listing/{p['listing_id']}?{UTM}"
+    return f"https://www.etsy.com/listing/{p['listing_id']}?{p.get('utm', UTM)}"
 
 
 def prose(p) -> str:
@@ -57,7 +59,7 @@ def page(title, desc, canonical, body, image=None) -> str:
 <link rel="stylesheet" href="/style.css">
 </head><body>
 <header class="wrap"><a href="/"><img src="/img/logo.png" alt="ChromaChaos digital arts"></a></header>
-<nav><a href="/#latest">Latest</a><a href="/#destinations">Favourites</a><a href="/#about">About</a><a href="{SHOP}">Shop on Etsy</a></nav>
+<nav><a href="/#latest">Fresh picks</a><a href="/#destinations">Favourites</a><a href="/#about">About</a><a href="{SHOP}">Shop on Etsy</a></nav>
 <main class="wrap">
 {body}
 </main>
@@ -68,7 +70,7 @@ def page(title, desc, canonical, body, image=None) -> str:
 
 def card(p) -> str:
     return (f'<a class="card" href="{path_of(p)}"><img src="/{p["image"]}" alt="{e(p["name"])} watercolour clipart" '
-            f'loading="lazy" width="1000" height="1500"><span>{e(p["name"])}</span></a>')
+            f'loading="lazy" width="{p.get('w', 1000)}" height="{p.get('h', 1500)}"><span>{e(p["name"])}</span></a>')
 
 
 def write(rel: str, text: str) -> None:
@@ -109,7 +111,7 @@ def main() -> None:
                      + "".join(card(q) for q in more) + "</div></section>") if more else ""
         body = f"""<p class="crumb"><a href="/">ChromaChaos</a> · {e(p['name'])}</p>
 <div class="pin">
-<img src="/{p['image']}" alt="{e(p['title'])}" width="1000" height="1500">
+<img src="/{p['image']}" alt="{e(p['title'])}" width="{p.get('w', 1000)}" height="{p.get('h', 1500)}">
 <div>
 <h1>{e(p['title'])}</h1>
 <p>{e(prose(p))}</p>
@@ -124,7 +126,7 @@ def main() -> None:
     featured = json.loads((HERE / "img" / "featured.json").read_text(encoding="utf-8"))
     fav = "".join(f'<a class="card" href="{e(f["url"])}"><img src="/img/{f["key"]}.jpg" alt="{e(f["name"])} watercolour clipart" '
                   f'loading="lazy" width="1000" height="800"><span>{e(f["name"])}</span></a>' for f in featured)
-    latest_html = (f'<section id="latest"><h2>Latest sets</h2><div class="grid tall">{"".join(card(p) for p in latest[:24])}</div></section>'
+    latest_html = (f'<section id="latest"><h2>Fresh picks</h2><div class="grid tall">{"".join(card(p) for p in latest[:24])}</div></section>'
                    if latest else "")
     home = f"""<h1>Watercolour travel clipart for every trip worth remembering</h1>
 <p class="lead">Hand-finished destination sets — landmarks, food, streets and the little details — made for travel journals, scrapbooks, photo books, cards and trip-themed parties.</p>
@@ -165,7 +167,7 @@ def main() -> None:
 <pubDate>{when}</pubDate>
 <description><![CDATA[<img src="{img}" alt="{e(p['title'])}"><p>{e(p['description'])}</p>]]></description>
 <enclosure url="{e(img)}" length="{size}" type="image/jpeg"/>
-<media:content url="{e(img)}" medium="image" type="image/jpeg" width="1000" height="1500"/>
+<media:content url="{e(img)}" medium="image" type="image/jpeg" width="{p.get('w', 1000)}" height="{p.get('h', 1500)}"/>
 </item>""")
     built = format_datetime(dt.datetime.now(dt.timezone.utc))
     write("feed.xml", f"""<?xml version="1.0" encoding="UTF-8"?>
