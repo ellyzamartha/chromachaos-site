@@ -70,7 +70,7 @@ def page(title, desc, canonical, body, image=None) -> str:
 
 def card(p) -> str:
     return (f'<a class="card" href="{path_of(p)}"><img src="/{p["image"]}" alt="{e(p["name"])} watercolour clipart" '
-            f'loading="lazy" width="{p.get('w', 1000)}" height="{p.get('h', 1500)}"><span>{e(p["name"])}</span></a>')
+            f'loading="lazy" width="{p.get("w", 1000)}" height="{p.get("h", 1500)}"><span>{e(p["name"])}</span></a>')
 
 
 def write(rel: str, text: str) -> None:
@@ -92,6 +92,7 @@ def main() -> None:
     shutil.copy2(HERE / "style.css", OUT / "style.css")
     (OUT / "pins").mkdir()
     for p in live:                                   # future pins stay off the site
+        (OUT / p["image"]).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(HERE / p["image"], OUT / p["image"])
     write("CNAME", BASE.split("//")[1] + "\n")
     write(".nojekyll", "")
